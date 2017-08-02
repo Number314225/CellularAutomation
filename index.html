@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> Cellular Automation </title>
+    <link rel="stylesheet" href="ca.css">
+</head>
+<body>
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+
+    </div>
+    <canvas id="c" onmousemove="MouseCoor(event)" onclick="MouseClick(event)"></canvas>
+    <div id="debug">
+        <button onclick="Run()">Run</button>
+        <button onclick="Stop()">Stop</button>
+        <button onclick="Clear()">Clear</button>
+        <button onclick="openNav()">&#9776;Open</button>
+    </div>
+    <div id="coor"></div>
+</body>
+<script>
+
+    function openNav(){
+        document.getElementById("mySidenav").style.width = "100%";
+    }
+    function closeNav(){
+        document.getElementById("mySidenav").style.width = "0";
+    }
+
+    var c = document.getElementById('c');
+    var ctx = c.getContext('2d');
+    var cell = [];//代表细胞的二位数组
+    var tx = Math.floor(window.innerWidth/10);//细胞个数
+    var ty = Math.floor(window.innerHeight/10);
+    var cx = c.width = tx * 10;//canvas像素数
+    var cy = c.height = ty * 10;
+    var state = null;
+    var cellCount = 0;
+    for(var i = 0; i <= ty; i++){
+        cell[i] = new Array();
+        for(var j = 0; j <= tx; j++){
+            var life = {
+                isLive: false,
+                nextLive: false
+            };
+            cell[i][j] = life;
+        }
+    }
+    function Run(){
+        state = setInterval(function(){
+            Update();
+            Draw();
+        },100);
+    }
+    function Stop(){
+        clearInterval(state);
+    }
+    function Clear(){
+        ctx.clearRect(0,0,cx,cy);
+        for(var i = 0; i <= tx; i++){
+            for(var j = 0; j<= ty; j++){
+                cell[j][i].isLive = false;
+            }
+        }
+    }
+    function MouseCoor(e){
+        var x = e.clientX;
+        var y = e.clientY;
+        var coor = "Coordinates:(" + x + "," + y + ")";
+        document.getElementById('coor').innerHTML = coor;
+    }
+    function MouseClick(e){
+        var ax = Math.floor(e.clientX/10);
+        var ay = Math.floor(e.clientY/10);
+        if(cell[ay][ax].isLive === false){
+            cell[ay][ax].isLive = true;
+            ctx.fillRect(ax*10,ay*10,9,9);
+        }else{
+            cell[ay][ax].isLive = false;
+            ctx.clearRect(ax*10,ay*10,9,9);
+        }
+    }
+    function Draw(){
+        ctx.clearRect(0,0,cx,cy);
+        for(var i = 0; i < tx; i++){
+            for(var j = 0; j < ty; j++){
+                if(cell[j][i].isLive === true){
+                    cellCount++;
+                    ctx.fillRect(i*10,j*10,9,9);
+                }
+                cell[j][i].isLive = cell[j][i].nextLive;
+                cell[j][i].nextLive = false;
+            }
+        }
+    }
+    function pdNextLife(jj,ii){
+        var count = 0;
+        if(cell[jj-1][ii-1].isLive === true){count++;}
+        if(cell[jj-1][ii].isLive === true){count++;}
+        if(cell[jj-1][ii+1].isLive === true){count++;}
+        if(cell[jj][ii-1].isLive === true){count++;}
+        if(cell[jj][ii+1].isLive === true){count++;}
+        if(cell[jj+1][ii-1].isLive === true){count++;}
+        if(cell[jj+1][ii].isLive === true){count++;}
+        if(cell[jj+1][ii+1].isLive === true){count++;}
+        if(cell[jj][ii].isLive === true){
+            if(count == 2 || count == 3){
+                return true;
+            }
+        }
+        if(cell[jj][ii].isLive === false)
+        {
+            if(count === 3){
+                return true;
+            }
+        }
+        return false;
+    }
+    function Update(){
+        for(var i = 1; i <= tx-1; i++){
+            for(var j = 1; j <= ty-1; j++){
+                cell[j][i].nextLive = pdNextLife(j,i);
+            }
+        }
+    }
+
+</script>
+</html>
