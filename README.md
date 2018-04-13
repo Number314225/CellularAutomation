@@ -4,7 +4,10 @@ Life game
 康威的生命游戏 又称细胞自动机
 
 git在线版本测试
-[百度1](http://www.baidu.com/" 百度一下"){:target="https://number314225.github.io/CellularAutomation/"} 
-
 
 https://number314225.github.io/CellularAutomation/
+
+在canvas上点击切换细胞的生死状态
+右下run开跑 stop暂停 clear清屏
+至于open... 是个坑
+也可以在run的状态下切换细胞生死状态
